@@ -9,12 +9,13 @@
 	
 	http://www.springframework.org/schema/util 
 	http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+	
+	<import resource="../mybatis/datasrc-stock.xml" />
+	
+	<context:component-scan base-package="com.key.tools.stock.service"
+		use-default-filters="false">
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Service" />
+	</context:component-scan>
 
-	<import resource="mybatis/datasrc.xml" />
-	<import resource="stock/stock.xml" />
-	
-	<bean id="httpAgent" class="com.key.tools.http.HttpAgent" init-method="init"
-	destroy-method="destroy">
-	</bean>
-	
 </beans>
