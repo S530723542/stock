@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.key.stock.db.dao.StockCollectMapper;
 import com.key.stock.db.model.StockCollect;
+import com.key.stock.pojo.StockVO;
 import com.key.stock.service.StockCollectingService;
 import com.key.tools.common.Constant;
 import com.key.tools.common.ErrCode;
@@ -78,7 +79,7 @@ public class StockCollectingServiceImpl implements StockCollectingService
 		return ErrCode.SUCCESS;
 	}
 
-	public List<StockCollect> getStockCollectsByUserId(long userId,
+	public List<StockVO> getStockCollectsByUserId(long userId,
 			int pageNum, int pageSize)
 	{
 		// TODO Auto-generated method stub
@@ -92,6 +93,13 @@ public class StockCollectingServiceImpl implements StockCollectingService
 	}
 
 	public int downStockCollection(long id)
+	{
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int countStockCollectsByUserId(long userId)
 	{
 		// TODO Auto-generated method stub
 		return 0;

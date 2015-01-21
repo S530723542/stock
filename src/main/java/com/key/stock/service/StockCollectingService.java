@@ -2,7 +2,7 @@ package com.key.stock.service;
 
 import java.util.List;
 
-import com.key.stock.db.model.StockCollect;
+import com.key.stock.pojo.StockVO;
 
 public interface StockCollectingService
 {
@@ -10,7 +10,9 @@ public interface StockCollectingService
 	
 	public int deleteStockCollection(long userId,long stockId);
 	
-	public List<StockCollect> getStockCollectsByUserId(long userId,int pageNum,int pageSize);
+	public List<StockVO> getStockCollectsByUserId(long userId,int pageNum,int pageSize);
+	
+	public int countStockCollectsByUserId(long userId);
 	
 	public int upStockCollection(long id);
 	
