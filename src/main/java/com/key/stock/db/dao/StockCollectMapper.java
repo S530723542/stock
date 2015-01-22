@@ -59,5 +59,7 @@ public interface StockCollectMapper
 	int getFirstPriorityByUserId(Long userId);
 
 	int priorityAutoReduce(StockCollect record);
+	
+	StockCollect selectByUniqueKey(StockCollect record);
 
 }

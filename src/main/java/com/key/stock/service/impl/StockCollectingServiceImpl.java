@@ -105,4 +105,11 @@ public class StockCollectingServiceImpl implements StockCollectingService
 		return 0;
 	}
 
+	@Override
+	public StockVO getStockCollection(long userId, long stockId)
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

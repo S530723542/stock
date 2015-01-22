@@ -10,6 +10,8 @@ public interface StockCollectingService
 	
 	public int deleteStockCollection(long userId,long stockId);
 	
+	public StockVO getStockCollection(long userId,long stockId);
+	
 	public List<StockVO> getStockCollectsByUserId(long userId,int pageNum,int pageSize);
 	
 	public int countStockCollectsByUserId(long userId);
