@@ -1,6 +1,7 @@
 package com.key.stock.controller.rest;
 
-import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
@@ -12,17 +13,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.key.stock.common.Constant;
-import com.key.stock.common.ImageType;
-import com.key.stock.common.SourceType;
-import com.key.stock.db.model.StockCollect;
 import com.key.stock.pojo.StockVO;
-import com.key.stock.service.StockCollectingService;
+import com.key.stock.service.StockShowService;
 import com.key.tools.common.ErrCode;
+import com.key.tools.common.ListRecord;
 import com.key.tools.common.RestResult;
-import com.key.tools.stock.db.model.Stock;
 import com.key.tools.stock.pojo.ExCode;
-import com.key.tools.stock.service.StockService;
 
 @RequestMapping("/key/web/")
 @Controller
@@ -30,74 +26,108 @@ public class StockControllerRest
 {
 
 	@Autowired
-	StockService stockService;
-
-	@Autowired
-	StockCollectingService stockCollectingService;
+	StockShowService	stockShowService;
 
 	@RequestMapping(value = "stock/show", method = RequestMethod.GET)
-	public @ResponseBody RestResult<StockVO> createUserResource(
+	public @ResponseBody RestResult<ListRecord<StockVO>> showStock(
+
 			ModelMap model,
 			HttpSession session,
 			@RequestParam(value = "source", required = true) String source,
 			@RequestParam(value = "type", required = true) String type,
 			@RequestParam(value = "exCode", required = false) String exCodeString,
-			@RequestParam(value = "pageNum", required = false) String pageNum,
-			@RequestParam(value = "pageSize", required = false) String pageSize)
+			@RequestParam(value = "pageNum", required = false) Integer pageNum,
+			@RequestParam(value = "pageSize", required = false) Integer pageSize)
 	{
-		RestResult<StockVO> restResult = new RestResult<StockVO>();
-		if (exCodeString != null)
+		RestResult<ListRecord<StockVO>> restResult = new RestResult<ListRecord<StockVO>>();
+		ListRecord<StockVO> listRecord = new ListRecord<StockVO>();
+		try
 		{
-			ExCode exCode = new ExCode();
-			exCode = exCode.parseExCode(exCodeString);
-			if (exCode == null)
+
+			Long userId = (Long) session.getAttribute("userId");
+
+			if (exCodeString != null)
 			{
-				restResult.setErrCode(ErrCode.STOCK_NOT_EXIST);
-				restResult.setErrMsg("该股票不存在！");
-				return restResult;
+				ExCode exCode = new ExCode();
+				exCode = exCode.parseExCode(exCodeString);
+				if (exCode == null)
+				{
+					restResult.setErrCode(ErrCode.STOCK_NOT_EXIST);
+					restResult.setErrMsg("该股票不存在！");
+					return restResult;
+				}
+
+				StockVO stockVO = stockShowService.getStockVOByExCode(
+						exCode.getExChange(), exCode.getCode(), source, type);
+				if (stockVO == null)
+				{
+					restResult.setErrCode(ErrCode.STOCK_NOT_EXIST);
+					restResult.setErrMsg("该股票不存在！");
+					return restResult;
+				}
+				if (userId != null)
+				{
+					boolean isExist = stockShowService.isExistStockCollect(
+							userId, stockVO.getId());
+
+					stockVO.setIsCollected(isExist);
+
+				} else
+				{
+					stockVO.setIsCollected(false);
+				}
+				List<StockVO> list = new ArrayList<StockVO>();
+				list.add(stockVO);
+				listRecord.setList(list);
+				restResult.setData(listRecord);
+
+			} else
+			{
+				List<StockVO> list = stockShowService.getStockCollectsByUserId(
+						userId, source, type, pageNum, pageSize);
+				int count = stockShowService.countStockCollectsByUserId(userId);
+				listRecord.setTotalNum(count);
+				listRecord.setList(list);
+				restResult.setData(listRecord);
 			}
-			Stock stock = stockService.getStockByExCode(exCode.getExChange(),
-					exCode.getCode());
-			// StockCollect stockCollect=stockCollectingService.
-		} else
+		} catch (Exception e)
 		{
-
+			restResult.setErrCode(ErrCode.SYSTEM_ERROR);
+			restResult.setErrMsg(e.getMessage());
+			restResult.setData(null);
 		}
-
 		return restResult;
 	}
 
-	private StockVO transToStockVO(Stock stock, StockCollect stockCollect,
-			String source, String type)
+	@RequestMapping(value = "stock/collect", method = RequestMethod.POST)
+	public @ResponseBody RestResult<Boolean> collectStock(ModelMap model,
+			HttpSession session,
+			@RequestParam(value = "stockId", required = true) Long stockId)
 	{
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-		StockVO stockVO = new StockVO();
-		switch (source)
+		RestResult<Boolean> restResult = new RestResult<Boolean>();
+		try
 		{
-		case SourceType.SINA:
-			stockVO.setUrl(generateSinaUrl(stock, type));
-			break;
 
-		case SourceType.LOCAL:
-			return null;
-
-		default:
-			return null;
+			Long userId = (Long) session.getAttribute("userId");
+			if (userId == null)
+			{
+				restResult.setErrCode(ErrCode.NOT_EXIST);
+				restResult.setErrMsg("用户不存在，请先登录！");
+				restResult.setData(false);
+			}
+			int errCode = stockShowService.collectStock(userId, stockId);
+			restResult.setErrCode(errCode);
+			if (errCode != 0)
+			{
+				restResult.setData(false);
+			}
+		} catch (Exception e)
+		{
+			restResult.setErrCode(ErrCode.SYSTEM_ERROR);
+			restResult.setErrMsg(e.getMessage());
+			restResult.setData(null);
 		}
-		stockVO.setAddTime(sdf.format(stockCollect.getCreateTime()));
-		stockVO.setCode(stock.getStockCode());
-		stockVO.setExChange(stock.getStockExchange());
-		stockVO.setId(stock.getId());
-		stockVO.setName(stock.getName());
-		return stockVO;
-	}
-
-	private String generateSinaUrl(Stock stock, String type)
-	{
-		String url = null;
-		url = Constant.SINA_IMAGE_URL_STRING + type + "/n/"
-				+ stock.getStockExchange() + stock.getStockCode() + ImageType.SUFFIX;
-		return url;
+		return restResult;
 	}
 
 }

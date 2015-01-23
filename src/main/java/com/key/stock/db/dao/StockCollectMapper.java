@@ -3,6 +3,7 @@ package com.key.stock.db.dao;
 import java.util.List;
 
 import com.key.stock.db.model.StockCollect;
+import com.key.tools.common.ListRecord;
 
 public interface StockCollectMapper
 {
@@ -61,5 +62,11 @@ public interface StockCollectMapper
 	int priorityAutoReduce(StockCollect record);
 	
 	StockCollect selectByUniqueKey(StockCollect record);
+	
+	List<StockCollect> selectBySelectiveLimit(ListRecord<StockCollect> listRecord);
+	
+	int countBySelective(StockCollect record);
+	
+	StockCollect selectByPrimaryKeyForUpdate(Long id);
 
 }

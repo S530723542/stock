@@ -2,17 +2,19 @@ package com.key.stock.pojo;
 
 public class StockVO
 {
-	private Long id;
-	
-	private String name;
-	
-	private String exChange;
-	
-	private String code;
-	
-	private String addTime;
-	
-	private String url;
+	private Long	id;
+
+	private String	name;
+
+	private String	exChange;
+
+	private String	code;
+
+	private String	addTime;
+
+	private String	url;
+
+	private Boolean	isCollected;
 
 	public Long getId()
 	{
@@ -73,6 +75,15 @@ public class StockVO
 	{
 		this.url = url;
 	}
-	
-	
+
+	public Boolean getIsCollected()
+	{
+		return isCollected;
+	}
+
+	public void setIsCollected(Boolean isCollected)
+	{
+		this.isCollected = isCollected;
+	}
+
 }
