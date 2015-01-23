@@ -12,9 +12,9 @@
 
 	<import resource="mybatis/datasrc.xml" />
 	<import resource="stock/stock.xml" />
-	
-	<bean id="httpAgent" class="com.key.tools.http.HttpAgent" init-method="init"
-	destroy-method="destroy">
+
+	<bean id="httpAgent" class="com.key.tools.http.HttpAgent"
+		init-method="init" destroy-method="destroy">
 	</bean>
-	
+
 </beans>

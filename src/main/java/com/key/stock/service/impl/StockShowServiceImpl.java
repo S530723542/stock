@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.key.stock.common.SinaUtil;
@@ -21,14 +22,15 @@ import com.key.tools.common.utils.DBUtils;
 import com.key.tools.stock.db.model.Stock;
 import com.key.tools.stock.service.StockService;
 
+@Service
 public class StockShowServiceImpl implements StockShowService
 {
 
 	@Autowired
-	StockCollectMapper	stockCollectMapper;
+	StockCollectMapper stockCollectMapper;
 
 	@Autowired
-	StockService		stockService;
+	StockService stockService;
 
 	@Transactional
 	public int collectStock(long userId, long stockId)
